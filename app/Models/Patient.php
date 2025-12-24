@@ -13,12 +13,12 @@ protected $fillable = [
   'first_name',
   'last_name',
   'dni',
+  'email',
   'birth_date',
   'gender',
   'blood_type',
   'phone',
   'social_security',
-  'email',
 ];
 
 

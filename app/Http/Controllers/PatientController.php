@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Models\Patient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 class PatientController extends Controller
 {
     public function index(Request $request)
@@ -90,21 +92,24 @@ class PatientController extends Controller
 
 public function update(Request $request, Patient $paciente)
 {
-    // ✅ 1) Log inicial: qué llega (ojo, no logueo todo el request por seguridad)
-    Log::info('PATIENT UPDATE - INICIO', [
-        'paciente_id'     => $paciente->id,
-        'user_id'         => optional($request->user())->id,
-        'email_request'   => $request->input('email'),
-        'dni_request'     => $request->input('dni'),
-        'keys'            => array_keys($request->all()),
-    ]);
+    if ($request->has('email')) {
+        $email = $request->input('email');
+        if (is_string($email)) {
+            $email = trim($email);
+            $request->merge([
+                'email' => $email === '' ? null : strtolower($email),
+            ]);
+        }
+    }
 
+    // ✅ Validación
     $validados = $request->validate([
         'first_name'      => 'required|string|max:100',
         'last_name'       => 'required|string|max:100',
         'dni'             => 'sometimes|string|max:20|unique:patients,dni,' . $paciente->id,
         'phone'           => 'nullable|string',
-        'email'           => 'nullable|email|max:255',
+        'email'           => 'sometimes|nullable|email|max:255',
+        'birth_date'      => 'nullable|date',
         'social_security' => 'nullable|string|max:255',
         'gender'          => 'nullable|in:M,F,X',
         'blood_type'      => 'nullable|in:O+,O-,A+,A-,B+,B-,AB+,AB-',
@@ -113,29 +118,12 @@ public function update(Request $request, Patient $paciente)
         'pathology_ids'   => 'nullable|array',
         'pathology_ids.*' => 'integer|exists:pathologies,id',
     ]);
+    $dataUpdate = collect($validados)->except(['allergy_ids', 'pathology_ids'])->toArray();
+    if (isset($dataUpdate['first_name'])) $dataUpdate['first_name'] = mb_strtoupper($dataUpdate['first_name']);
+    if (isset($dataUpdate['last_name']))  $dataUpdate['last_name']  = mb_strtoupper($dataUpdate['last_name']);
 
-    // ✅ 2) Log post-validación
-    Log::info('PATIENT UPDATE - VALIDATED', [
-        'paciente_id'      => $paciente->id,
-        'validated_email'  => $validados['email'] ?? null,
-        'validated_dni'    => $validados['dni'] ?? null,
-        'validated_keys'   => array_keys($validados),
-        'allergy_ids_count'=> isset($validados['allergy_ids']) ? count($validados['allergy_ids']) : null,
-        'pathology_ids_count'=> isset($validados['pathology_ids']) ? count($validados['pathology_ids']) : null,
-    ]);
+    $paciente->update($dataUpdate);
 
-    $dataToUpdate = collect($validados)->except(['allergy_ids', 'pathology_ids'])->toArray();
-
-    // ✅ 3) Log exacto de lo que va al update()
-    Log::info('PATIENT UPDATE - DATA TO UPDATE', [
-        'paciente_id' => $paciente->id,
-        'data'        => $dataToUpdate,
-    ]);
-
-    // ✅ 4) Guardado
-    $paciente->update($dataToUpdate);
-
-    // ✅ 5) Sync relaciones
     if ($request->has('allergy_ids')) {
         $paciente->allergies()->sync($validados['allergy_ids'] ?? []);
     }
@@ -144,19 +132,15 @@ public function update(Request $request, Patient $paciente)
         $paciente->pathologies()->sync($validados['pathology_ids'] ?? []);
     }
 
-    // ✅ 6) Refrescamos y logueamos lo que quedó en DB
-    $paciente->refresh();
-    Log::info('PATIENT UPDATE - AFTER SAVE', [
-        'paciente_id' => $paciente->id,
-        'email_db'    => $paciente->email,
-        'dni_db'      => $paciente->dni,
-    ]);
+    $paciente->refresh()->load(['allergies', 'pathologies']);
 
     return response()->json([
         'mensaje' => 'Ficha clínica actualizada correctamente',
-        'data'    => $paciente->load(['allergies', 'pathologies']),
+        'data'    => $paciente,
     ]);
 }
+
+
 
     public function updateBackground(Request $request, Patient $paciente)
     {
