@@ -12,10 +12,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ConversationService
 {
-    /**
-     * Devuelve una conversación directa entre dos usuarios.
-     * Si no existe, la crea sin duplicados.
-     */
+
     public function getOrCreateDirect(int $userAId, int $userBId): Conversation
     {
         if ($userAId === $userBId) {
@@ -23,12 +20,10 @@ class ConversationService
         }
 
         return DB::transaction(function () use ($userAId, $userBId) {
-
-            // Buscar conversación direct que tenga exactamente ambos usuarios
             $existing = Conversation::query()
                 ->direct()
-                ->whereHas('users', fn ($q) => $q->where('users.id', $userAId))
-                ->whereHas('users', fn ($q) => $q->where('users.id', $userBId))
+                ->whereHas('users', fn($q) => $q->where('users.id', $userAId))
+                ->whereHas('users', fn($q) => $q->where('users.id', $userBId))
                 ->withCount('users')
                 ->having('users_count', '=', 2)
                 ->first();
@@ -52,9 +47,6 @@ class ConversationService
         });
     }
 
-    /**
-     * Envía un mensaje y actualiza last_message_at.
-     */
     public function sendMessage(int $conversationId, int $senderId, string $body): Message
     {
         $body = trim($body);
@@ -79,9 +71,6 @@ class ConversationService
         });
     }
 
-    /**
-     * Marca como leído para el usuario en el pivot (recomendado).
-     */
     public function markAsRead(int $conversationId, int $userId): void
     {
         DB::table('conversation_user')
@@ -90,9 +79,6 @@ class ConversationService
             ->update(['last_read_at' => now(), 'updated_at' => now()]);
     }
 
-    /**
-     * Cantidad de no leídos usando pivot last_read_at.
-     */
     public function unreadCount(int $conversationId, int $userId): int
     {
         $lastReadAt = DB::table('conversation_user')
@@ -103,59 +89,56 @@ class ConversationService
         return Message::query()
             ->where('conversation_id', $conversationId)
             ->where('sender_id', '!=', $userId)
-            ->when($lastReadAt, fn ($q) => $q->where('created_at', '>', $lastReadAt))
+            ->when($lastReadAt, fn($q) => $q->where('created_at', '>', $lastReadAt))
             ->count();
     }
 
     public function sendMessageWithAttachments(
-    int $conversationId,
-    int $senderId,
-    ?string $body,
-    array $files
-): Message {
-    return DB::transaction(function () use ($conversationId, $senderId, $body, $files) {
+        int $conversationId,
+        int $senderId,
+        ?string $body,
+        array $files
+    ): Message {
+        return DB::transaction(function () use ($conversationId, $senderId, $body, $files) {
 
-        $message = Message::create([
-            'conversation_id' => $conversationId,
-            'sender_id' => $senderId,
-            'body' => $body,
-            'delivered_at' => now(),
-            'read_at' => null,
-        ]);
-
-        // Adjuntos
-        foreach ($files as $file) {
-            /** @var UploadedFile $file */
-            $uuid = (string) Str::uuid();
-            $safeName = preg_replace('/[^a-zA-Z0-9\.\-_]/', '_', $file->getClientOriginalName());
-            $path = "chats/{$conversationId}/{$uuid}-{$safeName}";
-
-            $stored = Storage::disk('public')->putFileAs(
-                dirname($path),
-                $file,
-                basename($path)
-            );
-
-            MessageAttachment::create([
-                'message_id' => $message->id,
-                'disk' => 'public',
-                'file_path' => $stored,
-                'original_name' => $file->getClientOriginalName(),
-                'mime_type' => $file->getClientMimeType(),
-                'size' => $file->getSize() ?? 0,
-                'sha1' => sha1_file($file->getRealPath()),
+            $message = Message::create([
+                'conversation_id' => $conversationId,
+                'sender_id' => $senderId,
+                'body' => $body,
+                'delivered_at' => now(),
+                'read_at' => null,
             ]);
-        }
 
-        Conversation::where('id', $conversationId)
-            ->update(['last_message_at' => now()]);
+            foreach ($files as $file) {
+                /** @var UploadedFile $file */
+                $uuid = (string) Str::uuid();
+                $safeName = preg_replace('/[^a-zA-Z0-9\.\-_]/', '_', $file->getClientOriginalName());
+                $path = "chats/{$conversationId}/{$uuid}-{$safeName}";
 
-        return $message->fresh([
-            'sender:id,name',
-            'attachments'
-        ]);
-    });
+                $stored = Storage::disk('public')->putFileAs(
+                    dirname($path),
+                    $file,
+                    basename($path)
+                );
+
+                MessageAttachment::create([
+                    'message_id' => $message->id,
+                    'disk' => 'public',
+                    'file_path' => $stored,
+                    'original_name' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getClientMimeType(),
+                    'size' => $file->getSize() ?? 0,
+                    'sha1' => sha1_file($file->getRealPath()),
+                ]);
+            }
+
+            Conversation::where('id', $conversationId)
+                ->update(['last_message_at' => now()]);
+
+            return $message->fresh([
+                'sender:id,name',
+                'attachments'
+            ]);
+        });
+    }
 }
-
-}
-

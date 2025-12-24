@@ -54,8 +54,8 @@ class AuthController extends Controller
         $validados = $request->validate([
             'name'      => 'required|string|max:255',
             'specialty' => 'required|string',
-            'mn_number' => 'required|string', // Matrícula Nacional
-            'mp_number' => 'required|string', // Matrícula Provincial
+            'mn_number' => 'required|string',
+            'mp_number' => 'required|string',
         ]);
 
         $user->update($validados);

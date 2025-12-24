@@ -19,18 +19,11 @@ class Consultation extends Model
         'treatment'
     ];
 
-    /**
-     * El paciente al que pertenece la consulta.
-     */
     public function patient()
     {
         return $this->belongsTo(Patient::class);
     }
 
-    /**
-     * El médico (User) que realizó la consulta.
-     * Usamos 'user_id' como clave foránea.
-     */
     public function doctor()
     {
         return $this->belongsTo(User::class, 'user_id');

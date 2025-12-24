@@ -12,13 +12,13 @@ class Turno extends Model
     protected $fillable = [
         'paciente_id',
         'user_id',
-        'medico_receptor_id', // ✅ FALTABA
+        'medico_receptor_id',
         'fecha',
         'hora',
         'motivo',
         'estado',
         'prioridad',
-        'es_derivacion',      // ✅ FALTABA
+        'es_derivacion',
     ];
 
     protected $casts = [

@@ -25,10 +25,6 @@ class Message extends Model
         'read_at'      => 'datetime',
     ];
 
-    /* =========================
-     * Relationships
-     * ========================= */
-
     public function conversation(): BelongsTo
     {
         return $this->belongsTo(Conversation::class);
@@ -44,10 +40,6 @@ class Message extends Model
         return $this->hasMany(\App\Models\MessageAttachment::class);
     }
 
-
-    /* =========================
-     * Scopes
-     * ========================= */
 
     public function scopeInConversation(Builder $query, int $conversationId): Builder
     {

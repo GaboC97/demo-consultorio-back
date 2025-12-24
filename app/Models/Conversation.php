@@ -11,8 +11,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Conversation extends Model
 {
     protected $fillable = [
-        'type',          // direct | group
-        'title',         // nullable
+        'type',
+        'title',
         'last_message_at',
     ];
 
@@ -20,9 +20,6 @@ class Conversation extends Model
         'last_message_at' => 'datetime',
     ];
 
-    /* =========================
-     * Relationships
-     * ========================= */
 
     public function users(): BelongsToMany
     {
@@ -36,15 +33,11 @@ class Conversation extends Model
         return $this->hasMany(Message::class)->oldest();
     }
 
-    // Útil para mostrar el último mensaje en el inbox
     public function lastMessage(): HasOne
     {
         return $this->hasOne(Message::class)->latestOfMany();
     }
 
-    /* =========================
-     * Scopes
-     * ========================= */
 
     public function scopeDirect(Builder $query): Builder
     {
@@ -58,7 +51,7 @@ class Conversation extends Model
 
     public function scopeForUser(Builder $query, int $userId): Builder
     {
-        return $query->whereHas('users', fn ($q) => $q->where('users.id', $userId));
+        return $query->whereHas('users', fn($q) => $q->where('users.id', $userId));
     }
 
     public function scopeInboxForUser(Builder $query, int $userId): Builder
@@ -69,13 +62,7 @@ class Conversation extends Model
             ->with(['lastMessage', 'users']);
     }
 
-    /* =========================
-     * Helpers
-     * ========================= */
 
-    /**
-     * Devuelve el "otro participante" en chats directos.
-     */
     public function otherParticipant(int $myUserId): ?User
     {
         if ($this->relationLoaded('users')) {

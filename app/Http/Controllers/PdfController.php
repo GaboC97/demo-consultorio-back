@@ -13,8 +13,6 @@ class PdfController extends Controller
     public function imprimirConsulta($id)
     {
         $consulta = Consultation::with(['patient', 'user'])->findOrFail($id);
-
-        // Datos del médico logueado (vos)
         $medico = $consulta->user;
 
         $data = [
@@ -26,7 +24,6 @@ class PdfController extends Controller
 
         $pdf = Pdf::loadView('pdfs.consulta', $data);
 
-        // Esto descarga el PDF con un nombre descriptivo
         return $pdf->download("consulta_{$consulta->patient->last_name}.pdf");
     }
 }

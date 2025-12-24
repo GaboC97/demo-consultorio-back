@@ -30,7 +30,6 @@ public function index(Request $request)
             'messages as unread_count' => function ($q) use ($userId) {
                 $q->where('sender_id', '!=', $userId)
                   ->where(function ($qq) use ($userId) {
-                      // Comparo contra el last_read_at del usuario en el pivot
                       $qq->whereRaw(
                           "messages.created_at > COALESCE(
                               (SELECT cu.last_read_at

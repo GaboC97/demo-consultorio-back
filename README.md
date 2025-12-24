@@ -1,66 +1,224 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Medical History System – Backend & Frontend
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+---
 
-## About Laravel
+## 🇪🇸 Español
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Sistema de **gestión médica y consultorio**, desarrollado para administrar pacientes, historiales clínicos, turnos y comunicación interna entre profesionales de la salud.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+El proyecto está pensado como una **aplicación completa**, con frontend moderno y backend robusto, orientado a entornos médicos reales.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🏥 Descripción general
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+El sistema permite a médicos y profesionales de la salud:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- Gestionar pacientes y sus datos personales
+- Registrar **historial médico completo**
+- Administrar **turnos médicos**
+- Cargar patologías, alergias y antecedentes
+- Comunicarse mediante un **chat interno entre médicos**
+- Enviar **archivos adjuntos** dentro de las conversaciones
+- Operar con autenticación segura
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## 🗂️ Módulos principales
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- Pacientes
+- Historial médico
+- Turnos
+- Alergias
+- Patologías
+- Consultas médicas
+- Usuarios médicos
+- Chat interno entre profesionales
+- Mensajes con archivos adjuntos
+- Gestión de accesos y tokens
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## 💬 Chat interno
 
-## Contributing
+El sistema incluye un **chat interno privado entre médicos**, con las siguientes características:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- Conversaciones entre usuarios médicos
+- Historial de mensajes persistente
+- Envío y descarga de **archivos adjuntos**
+- Control de acceso por usuario
+- Arquitectura preparada para escalar a tiempo real
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 🧱 Arquitectura
 
-## Security Vulnerabilities
+- Separación clara entre frontend y backend
+- API REST
+- Base de datos relacional normalizada
+- Tablas pivot para relaciones médicas complejas
+- Arquitectura pensada para escalar funcionalidades
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## 🚀 Tecnologías utilizadas
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Frontend
+- **Vite**
+- **JavaScript (ES Modules)**
+- **Axios**
+- **Laravel Vite Plugin**
+
+### Backend
+- **Laravel**
+- **PHP**
+- **MySQL**
+- **Autenticación por tokens**
+- **Gestión de archivos**
+
+---
+
+## 📦 Scripts disponibles
+
+```bash
+npm run dev
+npm run build
+```
+
+---
+
+## 👤 Usuarios de prueba
+
+**Médico**
+Email: doctor@test.com  
+Password: 12345  
+
+**Médico**
+Email: laura@test.com  
+Password: 12345  
+
+---
+
+## 🌐 Demo online
+
+El proyecto se encuentra deployado y puede probarse online utilizando las credenciales de demostración.
+
+https://demo-consultorio-front.vercel.app/
+---
+
+## 👨‍💻 Autor
+
+Desarrollado por **Gabriel Carbone**
+
+---
+
+---
+
+## 🇺🇸 English
+
+Medical **clinic and health record management system**, developed to manage patients, medical histories, appointments, and internal communication between healthcare professionals.
+
+The project is designed as a **full-featured application**, with a modern frontend and a robust backend, oriented toward real-world medical environments.
+
+---
+
+## 🏥 Overview
+
+The system allows doctors and healthcare professionals to:
+
+- Manage patients and personal data
+- Register **complete medical histories**
+- Manage **medical appointments**
+- Handle pathologies, allergies, and medical background
+- Communicate via an **internal medical chat**
+- Send and receive **file attachments**
+- Operate with secure authentication
+
+---
+
+## 🗂️ Main Modules
+
+- Patients
+- Medical history
+- Appointments
+- Allergies
+- Pathologies
+- Medical consultations
+- Medical users
+- Internal chat between professionals
+- Messages with file attachments
+- Access and token management
+
+---
+
+## 💬 Internal Chat
+
+The system includes a **private internal chat for medical professionals**, featuring:
+
+- One-to-one conversations
+- Persistent message history
+- File upload and download support
+- Secure access per user
+- Scalable architecture for real-time features
+
+---
+
+## 🧱 Architecture
+
+- Clear separation between frontend and backend
+- REST API
+- Normalized relational database
+- Pivot tables for complex medical relationships
+- Architecture designed for scalability
+
+---
+
+## 🚀 Technologies Used
+
+### Frontend
+- **Vite**
+- **JavaScript (ES Modules)**
+- **Axios**
+- **Laravel Vite Plugin**
+
+### Backend
+- **Laravel**
+- **PHP**
+- **MySQL**
+- **Token-based authentication**
+- **File management**
+
+---
+
+## 📦 Available Scripts
+
+```bash
+npm run dev
+npm run build
+```
+
+---
+
+## 👤 Demo Users
+
+**Doctor**
+Email: doctor@test.com  
+Password: 12345  
+
+**Doctor**
+Email: laura@test.com  
+Password: 12345  
+
+---
+
+## 🌐 Live Demo
+
+The project is deployed and available online.  
+Use the demo credentials to explore the system.
+
+https://demo-consultorio-front.vercel.app/
+---
+
+## 👨‍💻 Author
+
+Developed by **Gabriel Carbone**

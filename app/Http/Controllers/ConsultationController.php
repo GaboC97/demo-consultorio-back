@@ -10,20 +10,18 @@ use Illuminate\Http\Request;
 
 class ConsultationController extends Controller
 {
-    // Listar todas las consultas (opcional, para un panel general)
     public function index()
     {
         return ConsultationResource::collection(Consultation::with(['patient', 'doctor'])->latest()->paginate(10));
     }
 
-    // Guardar la consulta médica
 public function store(Request $request)
 {
     $validated = $request->validate([
         'patient_id' => 'required|exists:patients,id',
         'reason'     => 'required|string|max:255',
         'diagnosis'  => 'required|string',
-        'treatment'  => 'required|string', // Agregamos tratamiento como obligatorio
+        'treatment'  => 'required|string',
     ]);
 
     $consulta = Consultation::create([
@@ -31,13 +29,12 @@ public function store(Request $request)
         'user_id'    => auth()->id(), 
         'reason'     => $validated['reason'],
         'diagnosis'  => $validated['diagnosis'],
-        'treatment'  => $validated['treatment'], // Lo guardamos en la DB
+        'treatment'  => $validated['treatment'],
     ]);
 
     return response()->json(['mensaje' => 'Consulta registrada con éxito'], 201);
 }
 
-    // El famoso método para ver el historial de un paciente
     public function history(Patient $patient)
     {
         $consultas = $patient->consultations()->with('doctor')->latest()->get();

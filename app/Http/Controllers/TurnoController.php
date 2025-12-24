@@ -101,37 +101,27 @@ class TurnoController extends Controller
     public function update(Request $request, Turno $turno)
     {
         $userId = Auth::id();
-
-        // Permiso: solo emisor edita
+        
         if ((int)$turno->user_id !== (int)$userId) {
             return response()->json(['error' => 'No tienes permiso para editar este turno.'], 403);
         }
 
         $esDerivacion = (int)$turno->es_derivacion === 1;
 
-        // Si es derivación confirmada, bloquear edición (evita cambiar destino/prioridad post-agenda)
         if ($esDerivacion && $turno->estado === 'confirmado') {
             return response()->json(['error' => 'No puedes editar una derivación ya confirmada.'], 422);
         }
 
-        // Validación según tipo real del turno (no según lo que mande el front)
         $validated = $request->validate([
             'paciente_id'        => 'required|exists:patients,id',
             'motivo'             => 'nullable|string',
-
-            // Turno normal:
             'fecha'              => $esDerivacion ? 'nullable|date' : 'required|date',
             'hora'               => $esDerivacion ? 'nullable' : 'required',
-
-            // Derivación:
             'medico_receptor_id' => $esDerivacion ? 'required|exists:users,id' : 'nullable',
             'prioridad'          => $esDerivacion ? 'required|in:baja,media,alta,urgente' : 'nullable',
-
-            // Adjuntos opcionales (solo agregar)
             'archivos.*'         => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
 
-        // Seguridad: no derivar a uno mismo
         if ($esDerivacion && (int)$validated['medico_receptor_id'] === (int)$userId) {
             return response()->json(['error' => 'No puedes realizar una derivación a ti mismo.'], 422);
         }
@@ -139,28 +129,22 @@ class TurnoController extends Controller
         try {
             return DB::transaction(function () use ($turno, $validated, $request, $esDerivacion) {
 
-                // Update campos comunes
                 $turno->paciente_id = $validated['paciente_id'];
                 $turno->motivo      = $validated['motivo'] ?? null;
 
                 if ($esDerivacion) {
-                    // Derivación: permitir cambiar destino/prioridad mientras esté pendiente
                     $turno->medico_receptor_id = $validated['medico_receptor_id'];
                     $turno->prioridad          = $validated['prioridad'] ?? 'baja';
 
-                    // ✅ regla útil: si todavía no fue agendada, mantener fecha/hora en null
-                    // (si querés permitir que emisor ponga fecha/hora, eliminá estas 2 líneas)
-                    $turno->fecha = $turno->fecha; // no tocar
-                    $turno->hora  = $turno->hora;  // no tocar
+                    $turno->fecha = $turno->fecha;
+                    $turno->hora  = $turno->hora;
                 } else {
-                    // Turno normal
                     $turno->fecha = $validated['fecha'];
                     $turno->hora  = $validated['hora'];
                 }
 
                 $turno->save();
 
-                // Adjuntos: agregar nuevos (no borrar existentes)
                 if ($request->hasFile('archivos')) {
                     foreach ($request->file('archivos') as $archivo) {
                         $path = $archivo->store('adjuntos/turnos', 'public');
@@ -221,8 +205,6 @@ class TurnoController extends Controller
     public function destroyAdjunto(TurnoAdjunto $adjunto)
     {
         $turno = $adjunto->turno;
-
-        // Solo emisor puede borrar adjuntos del turno
         if ((int)$turno->user_id !== (int)Auth::id()) {
             return response()->json(['error' => 'No tienes permiso para borrar este archivo.'], 403);
         }

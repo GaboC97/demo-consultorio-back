@@ -32,7 +32,6 @@ class MessageController extends Controller
 
         $this->authorize('view', $conversation);
 
-        // Si estás paginando, mantenelo. Acá dejo simple:
         $messages = Message::query()
             ->where('conversation_id', $conversation->id)
             ->with(['sender:id,name', 'attachments'])
@@ -69,7 +68,6 @@ class MessageController extends Controller
         $disk = 'public';
 
         $message = DB::transaction(function () use ($conversation, $userId, $body, $request, $disk) {
-            // 1) Crear mensaje (si body vacío pero hay archivos, lo permitimos)
             $message = Message::create([
                 'conversation_id' => $conversation->id,
                 'sender_id' => $userId,
@@ -78,7 +76,6 @@ class MessageController extends Controller
                 'read_at' => null,
             ]);
 
-            // 2) Guardar adjuntos
             if ($request->hasFile('files')) {
                 foreach ($request->file('files') as $file) {
                     $path = $file->store("chats/{$conversation->id}", $disk);
@@ -95,13 +92,11 @@ class MessageController extends Controller
                 }
             }
 
-            // 3) Actualizar last_message_at
             $conversation->update(['last_message_at' => $message->created_at]);
 
             return $message;
         });
 
-        // devolver con attachments listos + url
         return response()->json([
             'data' => $message->load(['sender:id,name', 'attachments'])
         ], 201);

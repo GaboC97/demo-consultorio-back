@@ -30,7 +30,7 @@ Route::post('/login', [AuthController::class, 'login']);
 // Rutas protegidas
 Route::middleware('auth:sanctum')->group(function () {
 
-    // CRUDs principales en español
+    // CRUD
     Route::apiResource('pacientes', PatientController::class);
     Route::apiResource('consultas', ConsultationController::class);
     Route::apiResource('patologias', PathologyController::class);
@@ -61,6 +61,5 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     // Ruta específica para el historial de un paciente
-    // Nota: El parámetro {patient} puede quedar así, es un nombre de variable interna
     Route::get('pacientes/{patient}/historial', [ConsultationController::class, 'history']);
 });

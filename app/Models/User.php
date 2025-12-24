@@ -16,33 +16,32 @@ class User extends Authenticatable
         'email',
         'password',
         'specialty',
-        'mn_number', // Matrícula Nacional
-        'mp_number', // Matrícula Provincial
+        'mn_number',
+        'mp_number',
     ];
 
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed', // Esto es clave en Laravel 10/11
+        'password' => 'hashed',
     ];
 
-    // El médico solo se relaciona con las consultas que él mismo redactó
     public function consultations()
     {
         return $this->hasMany(Consultation::class);
     }
 
     public function patients()
-{
-    return $this->belongsToMany(\App\Models\Patient::class)->withTimestamps();
-}
+    {
+        return $this->belongsToMany(\App\Models\Patient::class)->withTimestamps();
+    }
 
-public function conversations(): BelongsToMany
-{
-    return $this->belongsToMany(
-        \App\Models\Conversation::class,
-        'conversation_user'
-    )
-    ->withPivot(['last_read_at', 'role'])
-    ->withTimestamps();
-}
+    public function conversations(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            \App\Models\Conversation::class,
+            'conversation_user'
+        )
+            ->withPivot(['last_read_at', 'role'])
+            ->withTimestamps();
+    }
 }
